@@ -1,0 +1,2 @@
+#Python Journal
+Note that the second list item under the Journal link doesn't work. I just wanted to get a sense of how a list of entries might look, but without creating multiple copies of the same detail layout.
