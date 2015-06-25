@@ -38,6 +38,13 @@ class Entry(Base):
         session.add(instance)
         return instance
 
+    @classmethod
+    def all(cls, session=None):
+        if session is None:
+            session = DBSession
+        return session.query(cls).order_by(cls.created.desc()).all()
+
+
 @view_config(route_name='home', renderer='templates/test.jinja2')
 def home(request):
     # import pdb; pdb.set_trace()
