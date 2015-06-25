@@ -6,10 +6,10 @@ from pyramid.view import view_config
 from waitress import serve
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import scoped_session, sessionmaker
+from zope.sqlalchemy import ZopeTransactionExtension
 import datetime
 # from pyramid.httpexceptions import HTTPNotFound
-from sqlalchemy.orm import scoped_session, sessionmaker
-from zope.alchemy import ZopeTransactionExtension
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 
@@ -30,6 +30,13 @@ class Entry(Base):
     created = sa.Column(
         sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
+    @classmethod
+    def write(cls, title=None, body_text=None, session=None):
+        if session is None:
+            session = DBSession
+        instance = cls(title=title, body_text=body_text)
+        session.add(instance)
+        return instance
 
 @view_config(route_name='home', renderer='templates/test.jinja2')
 def home(request):
@@ -53,13 +60,20 @@ def main():
     debug = os.environ.get('DEBUG', True)
     settings['reload_all'] = debug
     settings['debug_all'] = debug
+    if not os.environ.get('Testing', False):
+        #Connect to database only if not in testing
+        engine = sa.create_engine(DATABASE_URL)
+        DBSession.configure(bind=engine)
+
     # configuration setup
     config = Configurator(
         settings=settings
     )
+    # Allow packages to declare their configurations
     config.include('pyramid_jinja2')
+    config.include('pyramid_tm')
     config.add_route('home', '/')
-    config.add_route('other', '/other/{special_val}')
+    # config.add_route('other', '/other/{special_val}')
     config.scan()
     app = config.make_wsgi_app()
     return app
