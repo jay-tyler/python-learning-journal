@@ -22,31 +22,20 @@ def connection(request):
     engine = create_engine(TEST_DATABASE_URL)
     journal.Base.metadata.create_all(engine)
     connection = engine.connect()
-    #^^^ Equivalent to engine; exists for connection
     journal.DBSession.registry.clear()
-    #^^^ Clear the database so that there is nothing ther
     journal.DBSession.configure(bind=connection)
-    # I think binds this to this fixture; creates a pointer from DBSession 
-    #  to the connection
-    # Also can only bind once to DB; hence the switch in journal.py
     journal.Base.metadata.bind = engine
-    #Were not absolutely sure why this needs to be here too, but it does
     request.addfinalizer(journal.Base.metadata.drop_all)
-    #Drops the tables when we are done with the session
     return connection
 
 
 @pytest.fixture()
-# Note default scope is for function here
 def db_session(request, connection):
     from transaction import abort
     trans = connection.begin()
     request.addfinalizer(trans.rollback)
     request.addfinalizer(abort)
-
     from journal import DBSession
-    #  This is partly dealing with the pointer that was bound to connection in
-    #  connection fixture
     return DBSession
 
 
