@@ -1,0 +1,10 @@
+
+{% block foobar%}  
+    <ol>
+        {% for thing in stuff %}
+        {{thing}}
+        {% endfor %}
+    </ol>
+
+    <a href="{{ request.route_url('other', special_val=42) }}"> </a>
+{% endblock %}

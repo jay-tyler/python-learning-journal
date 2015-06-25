@@ -7,6 +7,11 @@ from waitress import serve
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 import datetime
+# from pyramid.httpexceptions import HTTPNotFound
+from sqlalchemy.orm import scoped_session, sessionmaker
+from zope.alchemy import ZopeTransactionExtension
+
+DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 
 
 DATABASE_URL = os.environ.get(
@@ -22,12 +27,19 @@ class Entry(Base):
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     title = sa.Column(sa.Unicode(127), nullable=False)
     body_text = sa.Column(sa.UnicodeText, nullable=False)
-    created = sa.Column(sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    created = sa.Column(
+        sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
 
-@view_config(route_name='home', renderer='string')
+@view_config(route_name='home', renderer='templates/test.jinja2')
 def home(request):
-    return "Hello World"
+    # import pdb; pdb.set_trace()
+    return {'one':'two', 'stuff': ['a','b','c']}
+
+@view_config(route_name='other', renderer='string')
+def other(request):
+    import pdb; pdb.set_trace()
+    return request.matchdict
 
 
 def init_db():
@@ -45,7 +57,9 @@ def main():
     config = Configurator(
         settings=settings
     )
+    config.include('pyramid_jinja2')
     config.add_route('home', '/')
+    config.add_route('other', '/other/{special_val}')
     config.scan()
     app = config.make_wsgi_app()
     return app
