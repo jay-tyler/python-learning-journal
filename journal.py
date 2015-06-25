@@ -21,6 +21,10 @@ DATABASE_URL = os.environ.get(
 
 Base = declarative_base()
 
+@view_config(route_name='home', renderer='templates/list.jinja2')
+def list_view(request):
+    entries = Entry.all()
+    return {'entries': entries}
 
 class Entry(Base):
     __tablename__ = "entries"
@@ -44,18 +48,6 @@ class Entry(Base):
             session = DBSession
         return session.query(cls).order_by(cls.created.desc()).all()
 
-
-@view_config(route_name='home', renderer='templates/test.jinja2')
-def home(request):
-    # import pdb; pdb.set_trace()
-    return {'one':'two', 'stuff': ['a','b','c']}
-
-@view_config(route_name='other', renderer='string')
-def other(request):
-    import pdb; pdb.set_trace()
-    return request.matchdict
-
-
 def init_db():
     engine = sa.create_engine(DATABASE_URL, echo=False)
     Base.metadata.create_all(engine)
@@ -67,7 +59,7 @@ def main():
     debug = os.environ.get('DEBUG', True)
     settings['reload_all'] = debug
     settings['debug_all'] = debug
-    if not os.environ.get('Testing', False):
+    if not os.environ.get('TESTING', False):
         #Connect to database only if not in testing
         engine = sa.create_engine(DATABASE_URL)
         DBSession.configure(bind=engine)
@@ -77,8 +69,8 @@ def main():
         settings=settings
     )
     # Allow packages to declare their configurations
-    config.include('pyramid_jinja2')
     config.include('pyramid_tm')
+    config.include('pyramid_jinja2')
     config.add_route('home', '/')
     # config.add_route('other', '/other/{special_val}')
     config.scan()

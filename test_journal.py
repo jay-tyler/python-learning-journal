@@ -7,25 +7,37 @@ from sqlalchemy.exc import IntegrityError
 
 TEST_DATABASE_URL = os.environ.get(
     'DATABASE_URL',
-    'postgresql://jason@localhost:5432/learning-journal'
+    'postgresql://jason@localhost:5432/test-learning-journal'
 )
+
+#TODO ^^^create a database corresponding to uri
+
 os.environ['DATABASE_URL'] = TEST_DATABASE_URL
 os.environ['TESTING'] = "True"
 
+import journal
 
 @pytest.fixture(scope='session')
 def connection(request):
     engine = create_engine(TEST_DATABASE_URL)
     journal.Base.metadata.create_all(engine)
     connection = engine.connect()
+    #^^^ Equivalent to engine; exists for connection
     journal.DBSession.registry.clear()
+    #^^^ Clear the database so that there is nothing ther
     journal.DBSession.configure(bind=connection)
+    # I think binds this to this fixture; creates a pointer from DBSession 
+    #  to the connection
+    # Also can only bind once to DB; hence the switch in journal.py
     journal.Base.metadata.bind = engine
+    #Were not absolutely sure why this needs to be here too, but it does
     request.addfinalizer(journal.Base.metadata.drop_all)
+    #Drops the tables when we are done with the session
     return connection
 
 
 @pytest.fixture()
+# Note default scope is for function here
 def db_session(request, connection):
     from transaction import abort
     trans = connection.begin()
@@ -33,7 +45,30 @@ def db_session(request, connection):
     request.addfinalizer(abort)
 
     from journal import DBSession
+    #  This is partly dealing with the pointer that was bound to connection in
+    #  connection fixture
     return DBSession
+
+
+@pytest.fixture
+def app():
+    from journal import main
+    from webtest import TestApp
+    app = main()
+    # main is just a factory that builds/returns configured wsgi apps
+    return TestApp(app)
+
+
+@pytest.fixture()
+def entry(db_session):
+    entry = journal.Entry.write(
+        title='Test Title',
+        body_text='Test Entry Text',
+        session=db_session
+    )
+    db_session.flush()
+    return entry
+
 
 def test_write_entry(db_session):
     kwargs = {'title': "Test Title", "body_text": "Entry text test"}
@@ -49,7 +84,8 @@ def test_write_entry(db_session):
         assert getattr(entry, field, None) is None
     #  Flush session to 'write' data to database
     db_session.flush()
-    #  Now there should be one entry
+    #  Flush is put out there, but not committed; there is an entry in 
+    #  the database, but it's not finalized
     assert db_session.query(journal.Entry).count() == 1
     for field in kwargs:
         if field != 'session':
@@ -90,5 +126,17 @@ def test_read_entries_one(db_session):
     for entry in entries:
         assert isinstance(entry, journal.Entry)
 
+def test_empty_listing(app):
+    response = app.get('/')
+    assert response.status_code == 200
+    actual = response.body
+    expected = 'No entries here so far'
+    assert expected in actual
 
-import journal
+def test_listing(app, entry):
+    response = app.get('/')
+    assert response.status_code == 200
+    actual = response.body
+    for field in ['title', 'body_text']:
+        expected = getattr(entry, field, 'absent')
+        assert expected in actual
