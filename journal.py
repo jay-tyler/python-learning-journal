@@ -9,6 +9,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 from zope.sqlalchemy import ZopeTransactionExtension
 import datetime
+from pyramid.httpexceptions import HTTPFound
+from sqlalchemy.exc import DBAPIError
+
 # from pyramid.httpexceptions import HTTPNotFound
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
@@ -21,10 +24,28 @@ DATABASE_URL = os.environ.get(
 
 Base = declarative_base()
 
+
 @view_config(route_name='home', renderer='templates/list.jinja2')
 def list_view(request):
     entries = Entry.all()
     return {'entries': entries}
+
+
+@view_config(route_name='add', request_method='POST')
+def add_entry(request):
+    title = request.params.get('title')
+    body_text = request.params.get('body_text')
+    Entry.write(title=title, body_text=body_text)
+    return HTTPFound(request.route_url('home'))
+
+
+@view_config(context=DBAPIError)
+def db_exception(context, request):
+    from pyramid.response import Response
+    response = Response(context.message)
+    response.status_int = 500
+    return Response
+
 
 class Entry(Base):
     __tablename__ = "entries"
@@ -48,6 +69,7 @@ class Entry(Base):
             session = DBSession
         return session.query(cls).order_by(cls.created.desc()).all()
 
+
 def init_db():
     engine = sa.create_engine(DATABASE_URL, echo=False)
     Base.metadata.create_all(engine)
@@ -60,7 +82,7 @@ def main():
     settings['reload_all'] = debug
     settings['debug_all'] = debug
     if not os.environ.get('TESTING', False):
-        #Connect to database only if not in testing
+        #  Connect to database only if not in testing
         engine = sa.create_engine(DATABASE_URL)
         DBSession.configure(bind=engine)
 
@@ -72,6 +94,7 @@ def main():
     config.include('pyramid_tm')
     config.include('pyramid_jinja2')
     config.add_route('home', '/')
+    config.add_route('add', '/add')
     # config.add_route('other', '/other/{special_val}')
     config.scan()
     app = config.make_wsgi_app()
