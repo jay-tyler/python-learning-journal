@@ -44,7 +44,7 @@ def db_exception(context, request):
     from pyramid.response import Response
     response = Response(context.message)
     response.status_int = 500
-    return Response
+    return response
 
 
 class Entry(Base):

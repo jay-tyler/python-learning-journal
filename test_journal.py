@@ -140,3 +140,8 @@ def test_post_to_add_view(app):
     actual = redirected.body
     for expected in entry_data.values():
         assert expected in actual
+
+def test_add_no_params(app):
+    response = app.post('/add', status=500)
+    assert 'IntegrityError' in response.body
+    
