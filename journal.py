@@ -11,6 +11,10 @@ from zope.sqlalchemy import ZopeTransactionExtension
 import datetime
 from pyramid.httpexceptions import HTTPFound
 from sqlalchemy.exc import DBAPIError
+from pyramid.authentication import AuthTktAuthenticationPolicy
+from pyramid.authorization import ACLAuthorizationPolicy
+from pyramid.security import remember, forget
+from cryptacular.bcrypt import BCRYPTPasswordManager
 
 # from pyramid.httpexceptions import HTTPNotFound
 
@@ -47,6 +51,26 @@ def db_exception(context, request):
     return response
 
 
+@view_config(route_name='login', renderer="templates/login.jinja2")
+def login(request):
+    """authenticate a user by username/password"""
+    username = request.params.get('username', '')
+    error = ''
+    if request.method == 'POST':
+        error = "Login Failed"
+        authenticated = False
+        try:
+            authenticated = do_login(request)
+        except ValueError as e:
+            error = str(e)
+
+        if authenticated:
+            headers = remember(request, username)
+            return HTTPFound(request.route_url('home'), headers=headers)
+
+    return {'error': error, 'username': username}
+
+
 class Entry(Base):
     __tablename__ = "entries"
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
@@ -75,31 +99,58 @@ def init_db():
     Base.metadata.create_all(engine)
 
 
+def do_login(request):
+    username = request.params.get('username', None)
+    password = request.params.get('password', None)
+    if not (username and password):
+        raise ValueError('both username and password are required')
+
+    settings = request.registry.settings
+    manager = BCRYPTPasswordManager()
+    if username == settings.get('auth.username', ''):
+        hashed = settings.get('auth.password', '')
+        return manager.check(hashed, password)
+    return False
+
+
 def main():
     """Create a configured wsgi app"""
     settings = {}
     debug = os.environ.get('DEBUG', True)
     settings['reload_all'] = debug
     settings['debug_all'] = debug
+    #  Adding these as step3
+    settings['auth.username'] = os.environ.get('AUTH_USERNAME', 'admin')
+    manager = BCRYPTPasswordManager()
+    settings['auth.password'] = os.environ.get(
+        'AUTH_PASSWORD', manager.encode('secret')
+        )
     if not os.environ.get('TESTING', False):
         #  Connect to database only if not in testing
         engine = sa.create_engine(DATABASE_URL)
         DBSession.configure(bind=engine)
+    # add a "secret" value for auth tkt signing
+    auth_secret = os.environ.get('JOURNAL_AUTH_SECRET', 'itsaseekrit')
 
     # configuration setup
     config = Configurator(
-        settings=settings
+        settings=settings,
+        authentication_policy=AuthTktAuthenticationPolicy(
+            secret=auth_secret,
+            hashalg='sha512'
+            ),
+        authorization_policy=ACLAuthorizationPolicy(),
     )
     # Allow packages to declare their configurations
     config.include('pyramid_tm')
     config.include('pyramid_jinja2')
     config.add_route('home', '/')
     config.add_route('add', '/add')
+    config.add_route('login', '/login')
     # config.add_route('other', '/other/{special_val}')
     config.scan()
     app = config.make_wsgi_app()
     return app
-
 
 if __name__ == '__main__':
     app = main()
