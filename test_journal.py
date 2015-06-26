@@ -129,3 +129,14 @@ def test_listing(app, entry):
     for field in ['title', 'body_text']:
         expected = getattr(entry, field, 'absent')
         assert expected in actual
+
+def test_post_to_add_view(app):
+    entry_data = {
+        'title': 'Hello there',
+        'body_text': 'This is a post'
+    }
+    response = app.post('/add', params=entry_data, status='3*')
+    redirected = response.follow()
+    actual = redirected.body
+    for expected in entry_data.values():
+        assert expected in actual
