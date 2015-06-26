@@ -228,7 +228,6 @@ def test_login_success(app):
 
 
 def test_login_fails(app):
-    import pdb; pdb.set_trace()
     username, password = ('admin', 'wrong')
     response = login_helper(username, password, app)
     assert response.status_code == 200
