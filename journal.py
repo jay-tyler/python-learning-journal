@@ -51,7 +51,7 @@ def db_exception(context, request):
     return response
 
 
-@view_config(route_name='login', renderer="templates/login.jinja2")
+@view_config(route_name='login', renderer='templates/login.jinja2')
 def login(request):
     """authenticate a user by username/password"""
     username = request.params.get('username', '')
