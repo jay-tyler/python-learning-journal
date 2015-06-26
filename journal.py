@@ -33,6 +33,7 @@ DATABASE_URL = os.environ.get(
     'DATABASE_URL',
     'postgresql://jason@localhost:5432/learning-journal')
 
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 Base = declarative_base()
 
