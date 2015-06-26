@@ -18,11 +18,11 @@ from cryptacular.bcrypt import BCRYPTPasswordManager
 
 #  Trying out some template loaders from jinja2; maybe will fix issues
 
-from jinja2 import Environment, PackageLoader
-env = Environment(loader=PackageLoader(
-    'journal', 'templates'))
+# from jinja2 import Environment, PackageLoader
+# env = Environment(loader=PackageLoader(
+#     'journal', 'templates'))
 
-login_template = env.get_template("login.jinja2")
+# login_template = env.get_template("login.jinja2")
 
 # from pyramid.httpexceptions import HTTPNotFound
 
