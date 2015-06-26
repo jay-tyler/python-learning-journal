@@ -78,6 +78,11 @@ def login(request):
 
     return {'error': error, 'username': username}
 
+@view_config(route_name='logout', renderer='templates/list.jinja2')
+def logout(request):
+    headers = forget(request)
+    return HTTPFound(request.route_url('home'), headers=headers)
+
 
 class Entry(Base):
     __tablename__ = "entries"
@@ -155,6 +160,7 @@ def main():
     config.add_route('home', '/')
     config.add_route('add', '/add')
     config.add_route('login', '/login')
+    config.add_route('logout', '/logout')
     # config.add_route('other', '/other/{special_val}')
     config.scan()
     app = config.make_wsgi_app()
