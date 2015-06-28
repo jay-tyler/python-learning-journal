@@ -16,16 +16,6 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import remember, forget
 from cryptacular.bcrypt import BCRYPTPasswordManager
 
-#  Trying out some template loaders from jinja2; maybe will fix issues
-
-# from jinja2 import Environment, PackageLoader
-# env = Environment(loader=PackageLoader(
-#     'journal', 'templates'))
-
-# login_template = env.get_template("login.jinja2")
-
-# from pyramid.httpexceptions import HTTPNotFound
-
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 
 
@@ -38,7 +28,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 Base = declarative_base()
 
 
-@view_config(route_name='home', renderer='templates/list.jinja2')
+@view_config(route_name='home', renderer='templates/index.jinja2')
 def list_view(request):
     entries = Entry.all()
     return {'entries': entries}
@@ -80,7 +70,7 @@ def login(request):
     return {'error': error, 'username': username}
 
 
-@view_config(route_name='logout', renderer='templates/list.jinja2')
+@view_config(route_name='logout', renderer='templates/index.jinja2')
 def logout(request):
     headers = forget(request)
     return HTTPFound(request.route_url('home'), headers=headers)

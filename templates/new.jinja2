@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="style.css">
+    <title>Jason Tyler - Python Learning Journal</title>
+  </head>
+  <body>
+    <header>
+        <div id="top-header">
+            <h1>Jason Tyler</h1>
+            <h2>Python Learning Journal</h2>
+        </div>
+        <div id="nav-header">
+            <nav>
+                <ul>
+                    <li><a href="index.html">Journal</a></li>
+                    <li class="selected"><a href="new.html">New Entry</a></li>
+                    <li class="disabled"><a href="edit.html">Edit Entry</a></li>        
+                </ul>
+            </nav>
+        </div>
+    </header>
+        <section id="edit-view">
+            <form>
+                <p id="title-box">
+                    <label for="title">Title</label>
+                    <input id="title" name="Title" type="text" value="">
+                </p>
+                <p id="post-box">
+                    <label for="post-text">Post</label>
+                    <textarea id="post-text" name="Post" type="text"></textarea>
+                </p>
+                 <div id="button">
+                     <button name="submit">Submit Changes</button>
+                </div>
+            </form>
+        </section>
+    <footer>
+          <p>&copy 2015 Jason Tyler.</p>
+    </footer>
+  </body>
+</html>
+
+
+{% block body %}
+{% if request.authenticated_userid %}
+<aside>
+<form action="{{ request.route_url('add') }}" method="POST" class="add_entry">
+  <div class="field">
+    <label for="title">Title</label>
+    <input type="text" size="30" name="title" id="title"/>
+  </div>
+  <div class="field">
+    <label for="body_text">Text</label>
+    <textarea name="body_text" id="body_text" rows="5" cols="80"></textarea>
+  </div>
+  <div class="control_row">
+    <input type="submit" value="Share" name="Share"/>
+  </div>
+</form>
+</aside>
+{% endif %}
+  <h2>Entries</h2>
+  {% for entry in entries %}
+  <article class="entry" id="entry={{entry.id}}">
+    <h3>{{ entry.title }}</h3>
+    <p class="dateline">{{ entry.created.strftime('%b. %d, %Y') }}
+    <div class="entry_body">
+      {{ entry.body_text|safe }}
+    </div>
+  </article>
+  {% else %}
+  <div class="entry">
+    <p><em>No entries here so far</em></p>
+  </div>
+  {% endfor %}
+{% endblock %}
