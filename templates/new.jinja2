@@ -9,17 +9,17 @@
 
 {% block page_content %}
   <section id="edit-view">
-      <form>
+      <form action="{{ request.route_url('add') }}" method='POST'>
           <p id="title-box">
               <label for="title">Title</label>
-              <input id="title" name="Title" type="text" value="">
+              <input id="title" name="title" type="text" value="">
           </p>
           <p id="post-box">
-              <label for="post-text">Post</label>
-              <textarea id="post-text" name="Post" type="text"></textarea>
+              <label for="body_text">Post</label>
+              <textarea id="post-text" name="body_text" type="text"></textarea>
           </p>
-           <div id="button">
-               <button name="submit"><a href='/add'>Submit Changes</a></button>
+          <div id="button">
+               <input type="submit" name="Submit" value="add">
           </div>
       </form>
   </section>
