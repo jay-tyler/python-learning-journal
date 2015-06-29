@@ -33,6 +33,9 @@ def list_view(request):
     entries = Entry.all()
     return {'entries': entries}
 
+@view_config(route_name='new', renderer='templates/new.jinja2')
+def new_entry(request):
+    return {}
 
 @view_config(route_name='add', request_method='POST')
 def add_entry(request):
@@ -153,6 +156,8 @@ def main():
     config.add_route('add', '/add')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
+    config.add_route('detail', '/detail')
+    config.add_route('new', '/new')
     config.add_static_view('static', os.path.join(HERE, 'static'))
     # config.add_route('other', '/other/{special_val}')
     config.scan()

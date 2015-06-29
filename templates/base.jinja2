@@ -18,8 +18,8 @@
                 <ul>
                 {% block nav %}
                     <li class="selected"><a href="/" >Journal</a></li>
-                    <li><a href="new.html">New Entry</a></li>
-                    <li class="disabled"><a href="edit.html">Edit Entry</a></li>    
+                    <li><a href="/new">New Entry</a></li>
+                    <li class="disabled"><a href="/edit">Edit Entry</a></li>    
                 {% endblock %}
                 </ul>
             </nav>
@@ -27,15 +27,6 @@
          
     </header>
     {% block page_content %}
-    <section id="entry-list">
-    <ul>
-        {%for entry in entries %}
-            <li><div>
-                <a href=?????><p>{{ entry.created.strftime('%b. %d, %Y') }}:    {{entry.title}}</p></a>
-            </li></div>
-        {% endfor %}
-    </ul>
-    </section>
     {% endblock %}
     <footer>
           <p>&copy 2015 Jason Tyler.</p>

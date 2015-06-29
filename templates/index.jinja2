@@ -2,14 +2,18 @@
 
 {% block nav %}
     <li class="selected"><a href="/" >Journal</a></li>
-    <li><a href="new.html">New Entry</a></li>
-    <li class="disabled"><a href="edit.html">Edit Entry</a></li>
+    <li><a href="/new">New Entry</a></li>
+    <li class="disabled"><a href="/edit">Edit Entry</a></li>
 {% endblock %}      
 
 {% block page_content %}
-    {%for entry in entries %}
-        <li><div>
-            <a href=?????><p>{{ entry.created.strftime('%b. %d, %Y') }}: {{entry.title}}</p></a>
-        </li></div>
-    {% endfor %}
+    <section id="entry-list">
+    <ul>
+        {%for entry in entries %}
+            <li><div>
+                <a href="/detail/{{entry.id}}"><p>{{ entry.created.strftime('%b. %d, %Y') }}:    {{entry.title}}</p></a>
+            </li></div>
+        {% endfor %}
+    </ul>
+    </section>
 {% endblock %}
