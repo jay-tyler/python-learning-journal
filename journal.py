@@ -33,9 +33,21 @@ def list_view(request):
     entries = Entry.all()
     return {'entries': entries}
 
+
+@view_config(route_name='detail', renderer='templates/detail.jinja2')
+def detail_view(request):
+    article_id = request.matchdict['id']
+    article = Entry.get_article(article_id)
+    title = article[0].title
+    body_text = article[0].body_text
+    created = article[0].created
+    return {'title': title, 'body_text': body_text, 'created': created}
+
+
 @view_config(route_name='new', renderer='templates/new.jinja2')
 def new_entry(request):
     return {}
+
 
 @view_config(route_name='add', request_method='POST')
 def add_entry(request):
@@ -101,6 +113,12 @@ class Entry(Base):
             session = DBSession
         return session.query(cls).order_by(cls.created.desc()).all()
 
+    @classmethod
+    def get_article(cls, article_id, session=None):
+        if session is None:
+            session = DBSession
+        return session.query(cls).filter(cls.id == article_id).all()
+
 
 def init_db():
     engine = sa.create_engine(DATABASE_URL, echo=False)
@@ -156,8 +174,9 @@ def main():
     config.add_route('add', '/add')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
-    config.add_route('detail', '/detail')
+    config.add_route('detail', '/detail/{id}')
     config.add_route('new', '/new')
+    config.add_route('edit', '/edit')
     config.add_static_view('static', os.path.join(HERE, 'static'))
     # config.add_route('other', '/other/{special_val}')
     config.scan()

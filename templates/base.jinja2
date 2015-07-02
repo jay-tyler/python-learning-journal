@@ -18,9 +18,9 @@
             <nav>
                 <ul>
                 {% block nav %}
-                    <li class="selected"><a href="/" >Journal</a></li>
-                    <li><a href="/new">New Entry</a></li>
-                    <li class="disabled"><a href="/edit">Edit Entry</a></li>    
+                    <li class="selected"><a href="{{ request.route_url('home') }}" >Journal</a></li>
+                    <li><a href="{{ request.route_url('new') }}">New Entry</a></li>
+                    <li class="disabled"><a href="{{ request.route_url('edit') }}">Edit Entry</a></li>    
                 {% endblock %}
                 </ul>
             </nav>

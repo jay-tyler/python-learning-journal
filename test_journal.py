@@ -235,6 +235,7 @@ def test_login_fails(app):
     assert "Login Failed" in actual
     assert INPUT_BTN not in actual
 
+
 def test_logout(app):
     test_login_success(app)
     redirect = app.get('/logout', status="3*")
@@ -242,4 +243,3 @@ def test_logout(app):
     assert response.status_code == 200
     actual = response.body
     assert INPUT_BTN not in actual
-
