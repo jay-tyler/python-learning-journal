@@ -8,6 +8,7 @@
 
 
 {% block page_content %}
+{% if request.authenticated_userid %}
   <section id="edit-view">
       <form action="{{ request.route_url('add') }}" method='POST'>
           <p id="title-box">
@@ -23,4 +24,5 @@
           </div>
       </form>
   </section>
+{% endif %}
 {% endblock %}

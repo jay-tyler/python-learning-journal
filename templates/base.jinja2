@@ -9,7 +9,11 @@
   <body>
     <header>
         <div id="top-header">
-            <p class="auth-link"><a href="/login">login</a></p>
+            {% if request.authenticated_userid %}
+                <p class="auth-link"><a href="{{ request.route_url("logout") }}">logout</a></p>
+            {% else %}
+                <p class="auth-link"><a href="/login">login</a></p>
+            {% endif %}
             <h1>Jason Tyler</h1>
             <h2>Python Learning Journal</h2>
         </div>

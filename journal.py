@@ -92,7 +92,6 @@ def login(request):
         if authenticated:
             headers = remember(request, username)
             return HTTPFound(request.route_url('home'), headers=headers)
-
     return {'error': error, 'username': username}
 
 
