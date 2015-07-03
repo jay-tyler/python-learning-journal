@@ -13,6 +13,10 @@
             <li><div>
                 <a href="{{ request.route_path('detail', id=entry.id) }}"><p>{{ entry.created.strftime('%b. %d, %Y') }}:    {{entry.title}}</p></a>
             </li></div>
+        {% else %}
+        <div class="entry">
+        <p><em>No entries here so far</em></p>
+        </div>
         {% endfor %}
     </ul>
     </section>
