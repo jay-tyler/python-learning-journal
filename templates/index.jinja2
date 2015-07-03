@@ -1,0 +1,23 @@
+{% extends "base.jinja2" %}
+
+{% block nav %}
+    <li class="selected"><a href="{{ request.route_url('home') }}" >Journal</a></li>
+    <li><a href="{{ request.route_url('new') }}">New Entry</a></li>
+    <li class="disabled"><a href="">Edit Entry</a></li>
+{% endblock %}      
+
+{% block page_content %}
+    <section id="entry-list">
+    <ul>
+        {%for entry in entries %}
+            <li><div>
+                <a href="{{ request.route_path('detail', id=entry.id) }}"><p>{{ entry.created.strftime('%b. %d, %Y') }}:    {{entry.title}}</p></a>
+            </li></div>
+        {% else %}
+        <div class="entry">
+        <p><em>No entries here so far</em></p>
+        </div>
+        {% endfor %}
+    </ul>
+    </section>
+{% endblock %}

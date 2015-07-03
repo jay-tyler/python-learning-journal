@@ -1,29 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8">
-    <title>Python Learning Journal</title>
-    <!--[if lt IE 9]>
-    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link href="/static/style.css" rel="stylesheet" type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="/static/style.css" type="text/css">
+    <title>Jason Tyler - Python Learning Journal</title>
   </head>
   <body>
     <header>
-      <nav>
-        <ul>
-          <li><a href="/">Home</a></li>
-        </ul>
-      </nav>
+        <div id="top-header">
+            {% if request.authenticated_userid %}
+                <p class="auth-link"><a href="{{ request.route_url("logout") }}">logout</a></p>
+            {% else %}
+                <p class="auth-link"><a href="/login">login</a></p>
+            {% endif %}
+            <h1>Jason Tyler</h1>
+            <h2>Python Learning Journal</h2>
+        </div>
+        
+        <div id="nav-header">
+            <nav>
+                <ul>
+                {% block nav %}
+                    <li class="selected"><a href="{{ request.route_url('home') }}" >Journal</a></li>
+                    <li><a href="{{ request.route_url('new') }}">New Entry</a></li>
+                    <li class="disabled"><a href="">Edit Entry</a></li>    
+                {% endblock %}
+                </ul>
+            </nav>
+        </div>
+         
     </header>
-    <main>
-      <h1>My Python Journal</h1>
-      <section id="content">
-      {% block body %}{% endblock %}
-      </section>
-    </main>
+    {% block page_content %}
+    {% endblock %}
     <footer>
-      <p>Created in the Code Fellows Python Dev Accelerator</p>
+          <p>&copy 2015 Jason Tyler.</p>
     </footer>
   </body>
 </html>
+

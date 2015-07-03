@@ -16,16 +16,6 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import remember, forget
 from cryptacular.bcrypt import BCRYPTPasswordManager
 
-#  Trying out some template loaders from jinja2; maybe will fix issues
-
-# from jinja2 import Environment, PackageLoader
-# env = Environment(loader=PackageLoader(
-#     'journal', 'templates'))
-
-# login_template = env.get_template("login.jinja2")
-
-# from pyramid.httpexceptions import HTTPNotFound
-
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 
 
@@ -38,10 +28,36 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 Base = declarative_base()
 
 
-@view_config(route_name='home', renderer='templates/list.jinja2')
+@view_config(route_name='home', renderer='templates/index.jinja2')
 def list_view(request):
     entries = Entry.all()
     return {'entries': entries}
+
+
+@view_config(route_name='detail', renderer='templates/detail.jinja2')
+def detail_view(request):
+    article_id = request.matchdict['id']
+    article = Entry.get_article(article_id)
+    title = article[0].title
+    body_text = article[0].body_text
+    created = article[0].created
+    return {'title': title, 'body_text': body_text, 'created': created,
+            'article_id': article_id}
+
+
+@view_config(route_name='new', renderer='templates/new.jinja2')
+def new_entry(request):
+    return {}
+
+
+@view_config(route_name='edit', renderer='templates/edit.jinja2')
+def edit_entry(request):
+    article_id = request.matchdict['id']
+    article = Entry.get_article(article_id)
+    title = article[0].title
+    body_text = article[0].body_text
+    return {'title': title, 'body_text': body_text,
+            'article_id': article_id}
 
 
 @view_config(route_name='add', request_method='POST')
@@ -76,11 +92,10 @@ def login(request):
         if authenticated:
             headers = remember(request, username)
             return HTTPFound(request.route_url('home'), headers=headers)
-
     return {'error': error, 'username': username}
 
 
-@view_config(route_name='logout', renderer='templates/list.jinja2')
+@view_config(route_name='logout', renderer='templates/index.jinja2')
 def logout(request):
     headers = forget(request)
     return HTTPFound(request.route_url('home'), headers=headers)
@@ -107,6 +122,12 @@ class Entry(Base):
         if session is None:
             session = DBSession
         return session.query(cls).order_by(cls.created.desc()).all()
+
+    @classmethod
+    def get_article(cls, article_id, session=None):
+        if session is None:
+            session = DBSession
+        return session.query(cls).filter(cls.id == article_id).all()
 
 
 def init_db():
@@ -163,6 +184,9 @@ def main():
     config.add_route('add', '/add')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
+    config.add_route('detail', '/detail/{id}')
+    config.add_route('new', '/new')
+    config.add_route('edit', '/edit/{id}')
     config.add_static_view('static', os.path.join(HERE, 'static'))
     # config.add_route('other', '/other/{special_val}')
     config.scan()
