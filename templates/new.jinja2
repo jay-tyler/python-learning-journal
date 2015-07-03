@@ -3,7 +3,7 @@
 {% block nav %}
       <li><a href="{{ request.route_url('home') }}">Journal</a></li>
       <li class="selected"><a href="{{ request.route_url('new') }}">New Entry</a></li>
-      <li class="disabled"><a href="{{ request.route_url('edit') }}">Edit Entry</a></li>        
+      <li class="disabled"><a href="">Edit Entry</a></li>        
 {% endblock %}    
 
 
@@ -12,7 +12,7 @@
       <form action="{{ request.route_url('add') }}" method='POST'>
           <p id="title-box">
               <label for="title">Title</label>
-              <input id="title" name="title" type="text" value="">
+              <input id="title" name="title" type="text" value={{ title }}>
           </p>
           <p id="post-box">
               <label for="body_text">Post</label>

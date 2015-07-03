@@ -51,8 +51,13 @@ def new_entry(request):
 
 
 @view_config(route_name='edit', renderer='templates/edit.jinja2')
-def new_entry(request):
-    return {}
+def edit_entry(request):
+    article_id = request.matchdict['id']
+    article = Entry.get_article(article_id)
+    title = article[0].title
+    body_text = article[0].body_text
+    return {'title': title, 'body_text': body_text,
+            'article_id': article_id}
 
 
 @view_config(route_name='add', request_method='POST')
