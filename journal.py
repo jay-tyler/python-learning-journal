@@ -41,10 +41,16 @@ def detail_view(request):
     title = article[0].title
     body_text = article[0].body_text
     created = article[0].created
-    return {'title': title, 'body_text': body_text, 'created': created}
+    return {'title': title, 'body_text': body_text, 'created': created,
+            'article_id': article_id}
 
 
 @view_config(route_name='new', renderer='templates/new.jinja2')
+def new_entry(request):
+    return {}
+
+
+@view_config(route_name='edit', renderer='templates/edit.jinja2')
 def new_entry(request):
     return {}
 
@@ -176,7 +182,7 @@ def main():
     config.add_route('logout', '/logout')
     config.add_route('detail', '/detail/{id}')
     config.add_route('new', '/new')
-    config.add_route('edit', '/edit')
+    config.add_route('edit', '/edit/{id}')
     config.add_static_view('static', os.path.join(HERE, 'static'))
     # config.add_route('other', '/other/{special_val}')
     config.scan()
