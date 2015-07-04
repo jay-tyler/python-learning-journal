@@ -10,14 +10,12 @@ GLOBAL HTML ELEMENTS
 }
 
 h1 {
-    font-size: 0.8em;
     font-weight: normal;
     margin: 7px auto 5px;
     font-size: 3em;
 }
 
 h2 {
-    font-size: 2px;
     font-weight: normal;
     margin: 7px auto 5px;
     font-size: 3em;
@@ -41,6 +39,7 @@ footer p {
 
 li {
     list-style-position: inside;
+    font-size: 1em;
 }
 
 /*
@@ -205,7 +204,7 @@ DETAIL VIEW AND MARKDOWN DEFINITIONS
 #detail-view h4 {}
 
 #detail-view li {
-    font-size: 1em;
+    font-size: 0.9em;
     font-weight: 300;
     margin: 0 5% 
 }
@@ -213,4 +212,9 @@ DETAIL VIEW AND MARKDOWN DEFINITIONS
 .codehilite {
     margin: 5%;
     font-weight: 300;
+    font-size: 1em;
+}
+
+.codehilite pre{
+    font-size: 10px;
 }
