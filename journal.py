@@ -9,7 +9,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 from zope.sqlalchemy import ZopeTransactionExtension
 import datetime
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 from sqlalchemy.exc import DBAPIError
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
@@ -58,6 +58,7 @@ def new_entry(request):
 
 @view_config(route_name='edit', renderer='templates/edit.jinja2')
 def edit_entry(request):
+    #TODO: add authentication logic here
     article_id = request.matchdict['id']
     article = Entry.get_article(article_id)
     title = article[0].title
@@ -68,10 +69,13 @@ def edit_entry(request):
 
 @view_config(route_name='add', request_method='POST')
 def add_entry(request):
-    title = request.params.get('title')
-    body_text = request.params.get('body_text')
-    Entry.write(title=title, body_text=body_text)
-    return HTTPFound(request.route_url('home'))
+    if request.authenticated_userid:
+        title = request.params.get('title')
+        body_text = request.params.get('body_text')
+        Entry.write(title=title, body_text=body_text)
+        return HTTPFound(request.route_url('home'))
+    else:
+        return HTTPForbidden()
 
 
 @view_config(context=DBAPIError)
@@ -98,6 +102,7 @@ def login(request):
         if authenticated:
             headers = remember(request, username)
             return HTTPFound(request.route_url('home'), headers=headers)
+
     return {'error': error, 'username': username}
 
 
@@ -116,7 +121,7 @@ class Entry(Base):
         sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
     @classmethod
-    def write(cls, title=None, body_text=None, session=None):
+    def write(cls, title=None, body_text=None, session=None, id=None):
         if session is None:
             session = DBSession
         instance = cls(title=title, body_text=body_text)
