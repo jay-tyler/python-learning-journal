@@ -1,3 +1,9 @@
+/*
+************************************************************************
+GLOBAL HTML ELEMENTS
+************************************************************************
+*/
+
 * {
     font-family: Lato, sans-serif;
     font-color: #eee;
@@ -33,6 +39,16 @@ footer p {
     font-weight: lighter;
 }
 
+li {
+    list-style-position: inside;
+}
+
+/*
+************************************************************************
+GLOBAL CLASSES
+************************************************************************
+*/
+
 a:link {
     font-color: #eee;
 }
@@ -65,6 +81,12 @@ a:visited {
 .auth-link a {
     color: #bbb; 
 }
+
+/*
+************************************************************************
+IDs
+************************************************************************
+*/
 
 #jay-name {
     display: none;
@@ -123,11 +145,6 @@ a:visited {
     margin: 0;
 }
 
-#detail-view p {
-    margin: 5%;
-    font-weight: lighter;
-}
-
 #title-box input {
     width: 100%;
 }
@@ -139,4 +156,61 @@ a:visited {
 
 #button {
     text-align: center;
+}
+
+/*
+************************************************************************
+DETAIL VIEW AND MARKDOWN DEFINITIONS
+************************************************************************
+*/
+
+#article-title {
+    margin: 2%;
+    font-weight: 700;
+    font-size: 18px;
+    padding-bottom: 3px;
+    border-bottom: solid #bbb 1px;
+}
+
+#detail-view * {
+    font-size: 1em;
+}
+
+
+#detail-view p {
+    margin: 0 5%;
+    font-weight: lighter;
+    font-size: 0.8em;
+}
+
+#detail-view h1, h2, h3, h4 
+{
+    margin: 0 5%;
+    font-weight: 400;
+    font-size: 1em;
+}
+
+#detail-view h1 {
+    font-size: 2em;
+}
+
+#detail-view h2 {
+    font-size: 1.5em;
+}
+
+#detail-view h3 {
+    font-size: 1.25em;
+}
+
+#detail-view h4 {}
+
+#detail-view li {
+    font-size: 1em;
+    font-weight: 300;
+    margin: 0 5% 
+}
+
+.codehilite {
+    margin: 5%;
+    font-weight: 300;
 }

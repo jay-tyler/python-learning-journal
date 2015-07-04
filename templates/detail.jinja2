@@ -11,7 +11,9 @@
 
 {% block page_content %}
     <section id="detail-view">
-        <h3>{{ created.strftime('%b. %d, %Y') }}: {{ title }}<h3>
-        <p>{{ body_text|safe }}</p>          
+        <h3 id="article-title">{{ created.strftime('%b. %d, %Y') }}: {{ title }}<h2>
+        <div class="markdown">
+            <p class>{{ body_text|safe }}</p>          
+        </div>
     </section>
 {% endblock %}
