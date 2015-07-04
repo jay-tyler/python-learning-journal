@@ -4,13 +4,14 @@
 }
 
 h1 {
+    font-size: 1em;
     font-weight: normal;
-    margin: 5px auto 0;
-    display: none;
+    margin: 7px auto 5px;
+    font-size: 3em;
 }
 
 h2 {
-    font-size: 1em;
+    font-size: 18px;
     font-weight: normal;
     margin: 7px auto 5px;
     font-size: 3em;
@@ -63,6 +64,10 @@ a:visited {
 
 .auth-link a {
     color: #bbb; 
+}
+
+#jay-name {
+    display: none;
 }
 
 #top-header {

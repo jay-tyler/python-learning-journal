@@ -8,6 +8,6 @@
 {% block page_content %}
     <section id="detail-view">
         <h3>{{ created.strftime('%b. %d, %Y') }}: {{ title }}<h3>
-        <p>{{ body_text }}</p>          
+        <p>{{ body_text|safe }}</p>          
     </section>
 {% endblock %}

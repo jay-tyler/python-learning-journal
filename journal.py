@@ -15,6 +15,9 @@ from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import remember, forget
 from cryptacular.bcrypt import BCRYPTPasswordManager
+from markdown2 import Markdown
+
+markdowner = Markdown(extras=["code-friendly"])
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 
@@ -40,6 +43,8 @@ def detail_view(request):
     article = Entry.get_article(article_id)
     title = article[0].title
     body_text = article[0].body_text
+    #  Adding markdown2 related tagging
+    body_text = markdowner.convert(body_text)
     created = article[0].created
     return {'title': title, 'body_text': body_text, 'created': created,
             'article_id': article_id}
