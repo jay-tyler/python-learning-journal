@@ -1,0 +1,30 @@
+{% extends "base.jinja2" %}
+
+{% block nav %}
+      <li><a href="{{ request.route_url('home') }}">Journal</a></li>
+      <li class="selected"><a href="{{ request.route_url('new') }}">New Entry</a></li>
+      <li class="disabled"><a href="">Edit Entry</a></li>        
+{% endblock %}    
+
+
+{% block page_content %}
+{% if request.authenticated_userid %}
+  <section id="edit-view">
+      <form action="{{ request.route_url('add') }}" method='POST'>
+          <p id="title-box">
+              <label for="title">Title</label>
+              <input id="title" name="title" type="text" value={{ title }}>
+          </p>
+          <p id="post-box">
+              <label for="body_text">Post</label>
+              <textarea id="post-text" name="body_text" type="text"></textarea>
+          </p>
+          <div id="button">
+               <input type="submit" name="Submit" value="add">
+          </div>
+      </form>
+  </section>
+{% else %}
+You need to be logged in to do this.
+{% endif %}
+{% endblock %}
