@@ -76,6 +76,7 @@ def edit_entry(request):
     else:
         return HTTPMethodNotAllowed()
 
+
 @view_config(route_name='add', request_method='POST')
 def add_entry(request):
     if request.authenticated_userid:
