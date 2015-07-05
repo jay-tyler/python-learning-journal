@@ -9,7 +9,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 from zope.sqlalchemy import ZopeTransactionExtension
 import datetime
-from pyramid.httpexceptions import HTTPFound, HTTPForbidden
+from pyramid.httpexceptions import HTTPFound, HTTPForbidden, HTTPMethodNotAllowed
 from sqlalchemy.exc import DBAPIError
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
@@ -58,7 +58,6 @@ def new_entry(request):
 
 @view_config(route_name='edit', renderer='templates/edit.jinja2')
 def edit_entry(request):
-    #TODO: add authentication logic here
     if request.method == 'GET':
         article_id = request.matchdict['id']
         article = Entry.get_article(article_id)
@@ -67,16 +66,15 @@ def edit_entry(request):
         return {'title': title, 'body_text': body_text, 'id': article_id}
     if request.method == 'POST':       
         if request.authenticated_userid:
-            new_title = request.matchdict['title']
-            new_body_text = request.matchdict['body_text']
+            new_title = request.params.get('title')
+            new_body_text = request.params.get('body_text')
             article_id = request.matchdict['id']
-            # article = Entry.get_article(article_id)
-            # article.title, article.body_text = new_title, new_body_text
-            Entry.write(title=new_title, body_text=new_body_text, id=article_id)
+            Entry.edit_entry(title=new_title, body_text=new_body_text, id=article_id)
             return HTTPFound(request.route_url('detail', id=article_id))
         else:
             return HTTPForbidden()
-
+    else:
+        return HTTPMethodNotAllowed()
 
 @view_config(route_name='add', request_method='POST')
 def add_entry(request):
@@ -138,6 +136,17 @@ class Entry(Base):
         instance = cls(title=title, body_text=body_text)
         session.add(instance)
         return instance
+
+    @classmethod
+    def edit_entry(cls, title=None, body_text=None, session=None, id=None):
+        if session is None:
+            session = DBSession
+        # instance = cls(title=title, body_text=body_text)
+        edit_article = cls.get_article(article_id=id)
+        edit_article[0].title = title
+        edit_article[0].body_text = body_text
+        session.add(edit_article[0])
+        return edit_article
 
     @classmethod
     def all(cls, session=None):
