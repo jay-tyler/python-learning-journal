@@ -168,19 +168,20 @@ def test_post_to_add_view_not_authorized(app, auth_req):
     actual = response.body
     assert "403 Forbidden"in actual
 
-# def test_post_to_add_view_authorized(app, auth_req):
-#     from journal import do_login
-#     auth_req.params = {'username': 'admin', 'password': 'secret'}
-#     assert do_login(auth_req) == True
-#     # response = app.get('/new')
-#     entry_data = {
-#         'title': 'Hello there',
-#         'body_text': 'This is a post'
-#     }
-#     response = app.post('/add', params=entry_data, status='3*')
-#     redirected = response.follow()
-#     actual = redirected.body
-#     assert entry_data['title'] in actual
+
+def test_post_to_add_view_authorized(app, auth_req):
+    auth_req.params = {'username': 'admin', 'password': 'secret'}
+    redirect = app.post('/login', params=auth_req.params)
+    response = redirect.follow()
+    assert response.status_code == 200
+    entry_data = {
+        'title': 'Hello there',
+        'body_text': 'This is a post'
+    }
+    response = app.post('/add', params=entry_data, status='3*')
+    redirected = response.follow()
+    actual = redirected.body
+    assert entry_data['title'] in actual
 
 
 # def test_add_no_params(app):
