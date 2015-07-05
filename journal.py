@@ -44,9 +44,9 @@ def detail_view(request):
     article = Entry.get_article(article_id)
     title = article[0].title
     body_text = article[0].body_text
+    created = article[0].created
     #  Adding markdown2 related tagging
     body_text = markdowner.convert(body_text)
-    created = article[0].created
     return {'title': title, 'body_text': body_text, 'created': created,
             'article_id': article_id}
 
@@ -59,12 +59,23 @@ def new_entry(request):
 @view_config(route_name='edit', renderer='templates/edit.jinja2')
 def edit_entry(request):
     #TODO: add authentication logic here
-    article_id = request.matchdict['id']
-    article = Entry.get_article(article_id)
-    title = article[0].title
-    body_text = article[0].body_text
-    return {'title': title, 'body_text': body_text,
-            'article_id': article_id}
+    if request.method == 'GET':
+        article_id = request.matchdict['id']
+        article = Entry.get_article(article_id)
+        title = article[0].title
+        body_text = article[0].body_text
+        return {'title': title, 'body_text': body_text, 'id': article_id}
+    if request.method == 'POST':       
+        if request.authenticated_userid:
+            new_title = request.matchdict['title']
+            new_body_text = request.matchdict['body_text']
+            article_id = request.matchdict['id']
+            # article = Entry.get_article(article_id)
+            # article.title, article.body_text = new_title, new_body_text
+            Entry.write(title=new_title, body_text=new_body_text, id=article_id)
+            return HTTPFound(request.route_url('detail', id=article_id))
+        else:
+            return HTTPForbidden()
 
 
 @view_config(route_name='add', request_method='POST')

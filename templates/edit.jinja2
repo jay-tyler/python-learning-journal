@@ -10,7 +10,7 @@
 {% block page_content %}
 {% if request.authenticated_userid %}
   <section id="edit-view">
-      <form action="{{ request.route_url('add') }}" method='POST'>
+      <form action="{{ request.route_url('edit', id=id) }}" method='POST'>
           <p id="title-box">
               <label for="title">Title</label>
               <input id="title" name="title" type="text" value="{{ title }}">

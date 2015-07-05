@@ -184,9 +184,13 @@ def test_post_to_add_view_authorized(app, auth_req):
     assert entry_data['title'] in actual
 
 
-# def test_add_no_params(app):
-#     response = app.post('/add', status=500)
-#     assert 'IntegrityError' in response.body
+def test_add_no_params(app):
+    auth_req.params = {'username': 'admin', 'password': 'secret'}
+    redirect = app.post('/login', params=auth_req.params)
+    response = redirect.follow()
+    assert response.status_code == 200
+    response = app.post('/add', status=500)
+    assert 'IntegrityError' in response.body
 
 
 def test_do_login_success(auth_req):
