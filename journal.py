@@ -9,7 +9,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 from zope.sqlalchemy import ZopeTransactionExtension
 import datetime
-from pyramid.httpexceptions import HTTPFound, HTTPForbidden, HTTPMethodNotAllowed
+from pyramid.httpexceptions import (HTTPFound, HTTPForbidden,
+    HTTPMethodNotAllowed, HTTPNotFound)
 from sqlalchemy.exc import DBAPIError
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
@@ -64,36 +65,24 @@ def new_entry(request):
 @view_config(route_name='edit', renderer='templates/edit.jinja2')
 def edit_entry(request):
     if request.method == 'GET':
-        # import pdb; pdb.set_trace()
         article_id = request.matchdict['id']
         try:
             article = Entry.get_article(article_id)
-        except Exception as e:
-            print e # Not currently sure if I get KeyErr or ???
+        except KeyError as e:
+            return HTTPNotFound()
         return {'article': article}
     if request.method == 'POST':
         if request.authenticated_userid:
             new_title = request.params.get('title')
             new_body_text = request.params.get('body_text')
             article_id = request.matchdict['id']
-            Entry.edit_entry(title=new_title, body_text=new_body_text, id=article_id)
+            Entry.edit_entry(title=new_title, body_text=new_body_text,
+                             id=article_id)
             return HTTPFound(request.route_url('detail', id=article_id))
         else:
             return HTTPForbidden()
     else:
         return HTTPMethodNotAllowed()
-
-
-# @view_config(route_name='add', request_method='POST')
-# def add_entry(request):
-#     if request.authenticated_userid:
-#         title = request.params.get('title')
-#         body_text = request.params.get('body_text')
-#         Entry.write(title=title, body_text=body_text)
-#         return HTTPFound(request.route_url('home'))
-#     else:
-#         return HTTPForbidden()
-
 
 @view_config(context=DBAPIError)
 def db_exception(context, request):
@@ -152,7 +141,6 @@ class Entry(Base):
     def edit_entry(cls, title=None, body_text=None, session=None, id=None):
         if session is None:
             session = DBSession
-        # instance = cls(title=title, body_text=body_text)
         edit_article = cls.get_article(article_id=id)
         edit_article.title = title
         edit_article.body_text = body_text
@@ -197,7 +185,6 @@ def main():
     debug = os.environ.get('DEBUG', True)
     settings['reload_all'] = debug
     settings['debug_all'] = debug
-    #  Adding these as step3
     settings['auth.username'] = os.environ.get('AUTH_USERNAME', 'admin')
     manager = BCRYPTPasswordManager()
     settings['auth.password'] = os.environ.get(
@@ -223,14 +210,12 @@ def main():
     config.include('pyramid_tm')
     config.include('pyramid_jinja2')
     config.add_route('home', '/')
-    # config.add_route('add', '/add')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
     config.add_route('detail', '/detail/{id}')
     config.add_route('new', '/new')
     config.add_route('edit', '/edit/{id}')
     config.add_static_view('static', os.path.join(HERE, 'static'))
-    # config.add_route('other', '/other/{special_val}')
     config.scan()
     app = config.make_wsgi_app()
     return app
