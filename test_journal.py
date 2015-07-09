@@ -12,7 +12,7 @@ TEST_DATABASE_URL = os.environ.get(
     'postgresql://jason@localhost:5432/test-learning-journal'
 )
 
-INPUT_BTN = '<input type="submit" name="Submit" value="add">'
+INPUT_BTN = '<input type="submit" name="Submit" value="new">'
 
 
 os.environ['DATABASE_URL'] = TEST_DATABASE_URL
@@ -164,7 +164,7 @@ def test_post_to_add_view_not_authorized(app, auth_req):
         'title': 'Hello there',
         'body_text': 'This is a post'
     }
-    response = app.post('/add', params=entry_data, status='4*')
+    response = app.post('/new', params=entry_data, status='4*')
     actual = response.body
     assert "403 Forbidden"in actual
 
@@ -178,7 +178,7 @@ def test_post_to_add_view_authorized(app, auth_req):
         'title': 'Hello there',
         'body_text': 'This is a post'
     }
-    response = app.post('/add', params=entry_data, status='3*')
+    response = app.post('/new', params=entry_data, status='3*')
     redirected = response.follow()
     actual = redirected.body
     assert entry_data['title'] in actual
@@ -189,7 +189,7 @@ def test_add_no_params(app):
     redirect = app.post('/login', params=auth_req.params)
     response = redirect.follow()
     assert response.status_code == 200
-    response = app.post('/add', status=500)
+    response = app.post('/new', status=500)
     assert 'IntegrityError' in response.body
 
 
