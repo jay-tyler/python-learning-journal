@@ -42,11 +42,7 @@ def list_view(request):
 def detail_view(request):
     article_id = request.matchdict['id']
     article = Entry.get_article(article_id)
-    title = article.title
-    created = article.created
-    body_text = markdowner.convert(article.body_text)
-    return {'title': title, 'body_text': body_text, 'created': created,
-            'article_id': article_id}
+    return {'article': article}
 
 
 @view_config(route_name='new', renderer='templates/new.jinja2')
@@ -57,6 +53,7 @@ def new_entry(request):
 @view_config(route_name='edit', renderer='templates/edit.jinja2')
 def edit_entry(request):
     if request.method == 'GET':
+        # import pdb; pdb.set_trace()
         article_id = request.matchdict['id']
         try:
             article = Entry.get_article(article_id)
@@ -64,7 +61,6 @@ def edit_entry(request):
             print e # Not currently sure if I get KeyErr or ???
         return {'article': article}
     if request.method == 'POST':
-        import pdb; pdb.set_trace()
         if request.authenticated_userid:
             new_title = request.params.get('title')
             new_body_text = request.params.get('body_text')
@@ -129,6 +125,9 @@ class Entry(Base):
     body_text = sa.Column(sa.UnicodeText, nullable=False)
     created = sa.Column(
         sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
+
+    def render_text(self):
+        return markdowner.convert(self.body_text)
 
     @classmethod
     def write(cls, title=None, body_text=None, session=None, id=None):

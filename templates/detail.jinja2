@@ -6,14 +6,14 @@
 {% block nav %}
     <li><a href="{{ request.route_url('home') }}">Journal</a></li>
     <li><a href="{{ request.route_url('new') }}">New Entry</a></li>
-    <li><a href="{{ request.route_url('edit', id=article_id) }}">Edit Entry</a></li>
-{% endblock %}        
+    <li><a href="{{ request.route_url('edit', id=article.id) }}">Edit Entry</a></li>
+{% endblock %}
 
 {% block page_content %}
     <section id="detail-view">
-        <h3 id="article-title">{{ created.strftime('%b. %d, %Y') }}: {{ title }}<h2>
+        <h3 id="article-title">{{ article.created.strftime('%b. %d, %Y') }}: {{ article.title }}<h2>
         <div class="markdown">
-            <p class>{{ body_text|safe }}</p>          
+            <p class>{{ article.render_text()|safe }}</p>          
         </div>
     </section>
 {% endblock %}
