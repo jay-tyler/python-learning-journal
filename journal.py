@@ -47,7 +47,18 @@ def detail_view(request):
 
 @view_config(route_name='new', renderer='templates/new.jinja2')
 def new_entry(request):
-    return {}
+    if request.method == 'GET':
+        return {}
+    if request.method == 'POST':
+        if request.authenticated_userid:
+            title = request.params.get('title')
+            body_text = request.params.get('body_text')
+            Entry.write(title=title, body_text=body_text)
+            return HTTPFound(request.route_url('home'))
+        else:
+            return HTTPForbidden()
+    else:
+        return HTTPMethodNotAllowed()
 
 
 @view_config(route_name='edit', renderer='templates/edit.jinja2')
@@ -73,15 +84,15 @@ def edit_entry(request):
         return HTTPMethodNotAllowed()
 
 
-@view_config(route_name='add', request_method='POST')
-def add_entry(request):
-    if request.authenticated_userid:
-        title = request.params.get('title')
-        body_text = request.params.get('body_text')
-        Entry.write(title=title, body_text=body_text)
-        return HTTPFound(request.route_url('home'))
-    else:
-        return HTTPForbidden()
+# @view_config(route_name='add', request_method='POST')
+# def add_entry(request):
+#     if request.authenticated_userid:
+#         title = request.params.get('title')
+#         body_text = request.params.get('body_text')
+#         Entry.write(title=title, body_text=body_text)
+#         return HTTPFound(request.route_url('home'))
+#     else:
+#         return HTTPForbidden()
 
 
 @view_config(context=DBAPIError)
@@ -212,7 +223,7 @@ def main():
     config.include('pyramid_tm')
     config.include('pyramid_jinja2')
     config.add_route('home', '/')
-    config.add_route('add', '/add')
+    # config.add_route('add', '/add')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
     config.add_route('detail', '/detail/{id}')

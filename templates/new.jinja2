@@ -10,7 +10,7 @@
 {% block page_content %}
 {% if request.authenticated_userid %}
   <section id="edit-view">
-      <form action="{{ request.route_url('add') }}" method='POST'>
+      <form action="{{ request.route_url('new') }}" method='POST'>
           <p id="title-box">
               <label for="title">Title</label>
               <input id="title" name="title" type="text" value={{ title }}>
@@ -20,7 +20,7 @@
               <textarea id="post-text" name="body_text" type="text"></textarea>
           </p>
           <div id="button">
-               <input type="submit" name="Submit" value="add">
+               <input type="submit" name="Submit" value="new">
           </div>
       </form>
   </section>
