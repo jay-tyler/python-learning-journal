@@ -10,14 +10,14 @@
 {% block page_content %}
 {% if request.authenticated_userid %}
   <section id="edit-view">
-      <form action="{{ request.route_url('edit', id=id) }}" method='POST'>
+      <form action="{{ request.route_url('edit', id=article.id) }}" method='POST'>
           <p id="title-box">
               <label for="title">Title</label>
-              <input id="title" name="title" type="text" value="{{ title }}">
+              <input id="title" name="title" type="text" value="{{ article.title }}">
           </p>
           <p id="post-box">
               <label for="body_text">Post</label>
-              <textarea id="post-text" name="body_text" type="text">{{ body_text }}</textarea>
+              <textarea id="post-text" name="body_text" type="text">{{ article.body_text }}</textarea>
           </p>
           <div id="button">
                <input type="submit" name="Submit" value="edit">

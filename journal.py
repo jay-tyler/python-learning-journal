@@ -42,11 +42,9 @@ def list_view(request):
 def detail_view(request):
     article_id = request.matchdict['id']
     article = Entry.get_article(article_id)
-    title = article[0].title
-    body_text = article[0].body_text
-    created = article[0].created
-    #  Adding markdown2 related tagging
-    body_text = markdowner.convert(body_text)
+    title = article.title
+    created = article.created
+    body_text = markdowner.convert(article.body_text)
     return {'title': title, 'body_text': body_text, 'created': created,
             'article_id': article_id}
 
@@ -60,11 +58,13 @@ def new_entry(request):
 def edit_entry(request):
     if request.method == 'GET':
         article_id = request.matchdict['id']
-        article = Entry.get_article(article_id)
-        title = article[0].title
-        body_text = article[0].body_text
-        return {'title': title, 'body_text': body_text, 'id': article_id}
-    if request.method == 'POST':       
+        try:
+            article = Entry.get_article(article_id)
+        except Exception as e:
+            print e # Not currently sure if I get KeyErr or ???
+        return {'article': article}
+    if request.method == 'POST':
+        import pdb; pdb.set_trace()
         if request.authenticated_userid:
             new_title = request.params.get('title')
             new_body_text = request.params.get('body_text')
@@ -144,9 +144,9 @@ class Entry(Base):
             session = DBSession
         # instance = cls(title=title, body_text=body_text)
         edit_article = cls.get_article(article_id=id)
-        edit_article[0].title = title
-        edit_article[0].body_text = body_text
-        session.add(edit_article[0])
+        edit_article.title = title
+        edit_article.body_text = body_text
+        session.add(edit_article)
         return edit_article
 
     @classmethod
@@ -159,7 +159,7 @@ class Entry(Base):
     def get_article(cls, article_id, session=None):
         if session is None:
             session = DBSession
-        return session.query(cls).filter(cls.id == article_id).all()
+        return session.query(cls).filter(cls.id == article_id).one()
 
 
 def init_db():
