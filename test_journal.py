@@ -184,6 +184,23 @@ def test_post_to_add_view_authorized(app, auth_req):
     assert entry_data['title'] in actual
 
 
+def test_detail_view_permalink(app, auth_req):
+    auth_req.params = {'username': 'admin', 'password': 'secret'}
+    redirect = app.post('/login', params=auth_req.params)
+    response = redirect.follow()
+    assert response.status_code == 200
+    entry_data = {
+        'title': 'Hello there',
+        'body_text': 'This is a post'
+    }
+    makepost = app.post('/new', params=entry_data, status='3*')
+    redirected = makepost.follow()
+    #  it's a little weird that the only extant detail page goes to id = 9
+    #  will tease this out later
+    detailview = app.get('/detail/9')
+    assert entry_data['body_text'] in detailview.body
+
+
 def test_get_add_view_not_authorized(app, auth_req):
     response = app.get('/new', status='2*')
     actual = response.body

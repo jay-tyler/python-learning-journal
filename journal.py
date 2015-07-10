@@ -55,12 +55,14 @@ def new_entry(request):
             title = request.params.get('title')
             body_text = request.params.get('body_text')
             try:
-                Entry.write(title=title, body_text=body_text)
+                newart = Entry.write(title=title, body_text=body_text)
             except ValueError:
                 #  Right now we stupidly go back to new view;
                 #  need to implement some kind of user feedback
                 return HTTPFound(request.route_url('new'))
-            return HTTPFound(request.route_url('home'))
+            # TODO: edit points towards the detail page; new view probably
+            # should as well. Need to find a way to return the article id.
+            return HTTPFound(request.route_url('detail', id=newart.id))
         else:
             return HTTPForbidden()
     else:
@@ -87,7 +89,7 @@ def edit_entry(request):
             except ValueError:
                 #  Right now we stupidly go back to edit view;
                 #  need to implement some kind of user feedback
-                return HTTPFound(request.route_url('edit', id=article_id))             
+                return HTTPFound(request.route_url('edit', id=article_id))            
             return HTTPFound(request.route_url('detail', id=article_id))
         else:
             return HTTPForbidden()
