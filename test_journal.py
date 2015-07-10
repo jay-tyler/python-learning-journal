@@ -89,13 +89,13 @@ def test_write_entry(db_session):
     #  Creating an entry using the 'write' class method
     entry = journal.Entry.write(**kwargs)
     assert isinstance(entry, journal.Entry)
-    #id and created made only on writing to database
+    #  id and created made only on writing to database
     auto_fields = ['id', 'created']
     for field in auto_fields:
         assert getattr(entry, field, None) is None
     #  Flush session to 'write' data to database
     db_session.flush()
-    #  Flush is put out there, but not committed; there is an entry in 
+    #  Flush is put out there, but not committed; there is an entry in
     #  the database, but it's not finalized
     assert db_session.query(journal.Entry).count() == 1
     for field in kwargs:
@@ -182,6 +182,12 @@ def test_post_to_add_view_authorized(app, auth_req):
     redirected = response.follow()
     actual = redirected.body
     assert entry_data['title'] in actual
+
+
+def test_get_add_view_not_authorized(app, auth_req):
+    response = app.get('/new', status='2*')
+    actual = response.body
+    assert "You need to be logged in to do this." in actual
 
 
 def test_add_no_params(app):

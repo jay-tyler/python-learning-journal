@@ -54,7 +54,12 @@ def new_entry(request):
         if request.authenticated_userid:
             title = request.params.get('title')
             body_text = request.params.get('body_text')
-            Entry.write(title=title, body_text=body_text)
+            try:
+                Entry.write(title=title, body_text=body_text)
+            except ValueError:
+                #  Right now we stupidly go back to new view;
+                #  need to implement some kind of user feedback
+                return HTTPFound(request.route_url('new'))
             return HTTPFound(request.route_url('home'))
         else:
             return HTTPForbidden()
@@ -68,7 +73,7 @@ def edit_entry(request):
         article_id = request.matchdict['id']
         try:
             article = Entry.get_article(article_id)
-        except KeyError as e:
+        except KeyError:
             return HTTPNotFound()
         return {'article': article}
     if request.method == 'POST':
@@ -76,8 +81,13 @@ def edit_entry(request):
             new_title = request.params.get('title')
             new_body_text = request.params.get('body_text')
             article_id = request.matchdict['id']
-            Entry.edit_entry(title=new_title, body_text=new_body_text,
-                             id=article_id)
+            try:
+                Entry.edit_entry(title=new_title, body_text=new_body_text,
+                                 id=article_id)
+            except ValueError:
+                #  Right now we stupidly go back to edit view;
+                #  need to implement some kind of user feedback
+                return HTTPFound(request.route_url('edit', id=article_id))             
             return HTTPFound(request.route_url('detail', id=article_id))
         else:
             return HTTPForbidden()
@@ -133,19 +143,29 @@ class Entry(Base):
     def write(cls, title=None, body_text=None, session=None, id=None):
         if session is None:
             session = DBSession
-        instance = cls(title=title, body_text=body_text)
-        session.add(instance)
-        return instance
+        if title != "" and body_text != "":
+            # Form will pass empty string when empty
+            instance = cls(title=title, body_text=body_text)
+            session.add(instance)
+            return instance
+        else:
+            # Case of empty string
+            raise ValueError
 
     @classmethod
     def edit_entry(cls, title=None, body_text=None, session=None, id=None):
         if session is None:
             session = DBSession
         edit_article = cls.get_article(article_id=id)
-        edit_article.title = title
-        edit_article.body_text = body_text
-        session.add(edit_article)
-        return edit_article
+        if title != "" and body_text != "":
+            # Form will pass empty string when empty
+            edit_article.title = title
+            edit_article.body_text = body_text
+            session.add(edit_article)
+            return edit_article
+        else:
+            # Case of empty string
+            raise ValueError
 
     @classmethod
     def all(cls, session=None):
@@ -219,6 +239,7 @@ def main():
     config.scan()
     app = config.make_wsgi_app()
     return app
+
 
 if __name__ == '__main__':
     app = main()
