@@ -8,6 +8,7 @@ import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 from zope.sqlalchemy import ZopeTransactionExtension
+import transaction
 import datetime
 from pyramid.httpexceptions import (HTTPFound, HTTPForbidden,
                                     HTTPMethodNotAllowed, HTTPNotFound)
@@ -41,6 +42,7 @@ def list_view(request):
 
 @view_config(route_name='detail', renderer='templates/detail.jinja2')
 def detail_view(request):
+    import pdb; pdb.set_trace()
     article_id = request.matchdict['id']
     article = Entry.get_article(article_id)
     return {'article': article}
@@ -56,10 +58,11 @@ def new_entry(request):
             body_text = request.params.get('body_text')
             try:
                 newart = Entry.write(title=title, body_text=body_text)
+                DBSession.flush()
             except ValueError:
                 #  Right now we stupidly go back to new view;
                 #  need to implement some kind of user feedback
-                return HTTPFound(request.route_url('new'))
+                return HTTPFound(request.route_url('home'))
             # TODO: edit points towards the detail page; new view probably
             # should as well. Need to find a way to return the article id.
             return HTTPFound(request.route_url('detail', id=newart.id))
