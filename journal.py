@@ -65,7 +65,9 @@ def new_entry(request):
             except ValueError:
                 #  Right now we stupidly go back to new view;
                 #  need to implement some kind of user feedback
-                return HTTPFound(request.route_url('home'))
+                return {'err_msg': 'Try Again: need both an entry and a title',
+                        'title': title,
+                        'body_text': body_text}
             # TODO: edit points towards the detail page; new view probably
             # should as well. Need to find a way to return the article id.
             return HTTPFound(request.route_url('detail', id=newart.id))
