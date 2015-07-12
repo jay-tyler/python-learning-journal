@@ -33,6 +33,12 @@
         </div>
          
     </header>
+    {% block err_message %}
+        {% if err_msg %}
+        <h2> {{ err_msg }} </h2>
+        {% endif %}
+    {% endblock %}
+
     {% block page_content %}
     {% endblock %}
     <footer>

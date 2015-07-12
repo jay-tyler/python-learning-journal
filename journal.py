@@ -13,6 +13,7 @@ import datetime
 from pyramid.httpexceptions import (HTTPFound, HTTPForbidden,
                                     HTTPMethodNotAllowed, HTTPNotFound)
 from sqlalchemy.exc import DBAPIError
+from sqlalchemy.orm.exc import NoResultFound
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import remember, forget
@@ -42,10 +43,12 @@ def list_view(request):
 
 @view_config(route_name='detail', renderer='templates/detail.jinja2')
 def detail_view(request):
-    import pdb; pdb.set_trace()
-    article_id = request.matchdict['id']
-    article = Entry.get_article(article_id)
-    return {'article': article}
+    try:
+        article_id = request.matchdict['id']
+        article = Entry.get_article(article_id)
+        return {'article': article}
+    except NoResultFound:
+        return HTTPFound(request.route_url('home'))
 
 
 @view_config(route_name='new', renderer='templates/new.jinja2')
