@@ -10,7 +10,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from zope.sqlalchemy import ZopeTransactionExtension
 import datetime
 from pyramid.httpexceptions import (HTTPFound, HTTPForbidden,
-    HTTPMethodNotAllowed, HTTPNotFound)
+                                    HTTPMethodNotAllowed, HTTPNotFound)
 from sqlalchemy.exc import DBAPIError
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
@@ -95,6 +95,7 @@ def edit_entry(request):
             return HTTPForbidden()
     else:
         return HTTPMethodNotAllowed()
+
 
 @view_config(context=DBAPIError)
 def db_exception(context, request):
