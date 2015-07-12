@@ -63,8 +63,6 @@ def new_entry(request):
                 newart = Entry.write(title=title, body_text=body_text)
                 DBSession.flush()
             except ValueError:
-                #  Right now we stupidly go back to new view;
-                #  need to implement some kind of user feedback
                 return {'err_msg': 'Try Again: need both an entry and a title',
                         'title': title,
                         'body_text': body_text}
@@ -95,9 +93,16 @@ def edit_entry(request):
                 Entry.edit_entry(title=new_title, body_text=new_body_text,
                                  id=article_id)
             except ValueError:
-                #  Right now we stupidly go back to edit view;
-                #  need to implement some kind of user feedback
-                return HTTPFound(request.route_url('edit', id=article_id))            
+                # implement something like this, though need to get access to 
+                # article ID on GET
+                # return {'err_msg': 'Try Again: need both an entry and a title',
+                #         'title': new_title,
+                #         'body_text': new_body_text}
+
+                # alternative is to *somehow* send err_msg along with response
+                
+                # for now
+                return HTTPFound(request.route_url('edit', id=article_id))  
             return HTTPFound(request.route_url('detail', id=article_id))
         else:
             return HTTPForbidden()
