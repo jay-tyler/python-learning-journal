@@ -290,3 +290,7 @@ def test_logout(app):
     new_view = app.get('/new')
     actual = new_view.body
     assert INPUT_BTN not in actual
+
+
+def test_permalink(entry, app):
+    entry.id
