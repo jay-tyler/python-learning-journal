@@ -298,3 +298,17 @@ def test_permalink(entry, app):
     assert detail.status_code == 200
     assert entry.body_text in detail.body
     assert entry.title in detail.body
+
+
+def test_edit(entry, app, auth_req):
+    entry_id = entry.id
+    edit_data = {
+        'title': 'Hello there: edited',
+        'body_text': 'This is an edited post'
+    }
+    # import pdb; pdb.set_trace()
+    edit_existing = app.post('/edit/{entry_id}'.format(entry_id=entry_id),
+                             params=edit_data, status='3*')
+    detail = app.get('/detail/{entry_id}'.format(entry_id=entry_id))
+    assert edit_data.body_text in detail.body
+    assert edit_data.title in detail.body
