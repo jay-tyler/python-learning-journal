@@ -293,4 +293,8 @@ def test_logout(app):
 
 
 def test_permalink(entry, app):
-    entry.id
+    entry_id = entry.id
+    detail = app.get('/detail/{entry_id}'.format(entry_id=entry_id))
+    assert detail.status_code == 200
+    assert entry.body_text in detail.body
+    assert entry.title in detail.body
