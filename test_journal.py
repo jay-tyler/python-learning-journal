@@ -331,3 +331,28 @@ def test_markdown(app, db_session):
     assert "<ul>" in detail.body
     assert "<ol>" in detail.body
     assert "<li>One</li>" in detail.body
+
+
+def test_code_color(app, db_session):
+    entry = journal.Entry.write(
+        title='Test Title',
+        body_text="\n".join(["```python",
+                             "from  __future__ import unicode_literals",
+                             "",
+                             "def foo(bar)",
+                             "    return int(bar) * 2",
+                             "",
+                             "class bar(object):",
+                             "    def __init__(self):",
+                             "        self.size = 4",
+                             "```"]),
+        session=db_session
+    )
+    db_session.flush()
+    entry_id = entry.id
+    detail = app.get('/detail/{entry_id}'.format(entry_id=entry_id))
+    print detail.body
+    assert '<div class="codehilite">' in detail.body
+    assert '<span class="kn">' in detail.body
+    assert '<span class="p">' in detail.body
+    assert '<span class="nf">' in detail.body
