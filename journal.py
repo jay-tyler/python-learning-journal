@@ -99,8 +99,7 @@ def edit_entry(request):
                 #         'title': new_title,
                 #         'body_text': new_body_text}
 
-                # alternative is to *somehow* send err_msg along with response
-                
+                # alternative is to *somehow* send err_msg along with response         
                 # for now
                 return HTTPFound(request.route_url('edit', id=article_id))  
             return HTTPFound(request.route_url('detail', id=article_id))

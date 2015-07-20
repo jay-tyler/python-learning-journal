@@ -184,23 +184,6 @@ def test_post_to_add_view_authorized(app, auth_req):
     assert entry_data['title'] in actual
 
 
-def test_detail_view_permalink(app, auth_req):
-    auth_req.params = {'username': 'admin', 'password': 'secret'}
-    redirect = app.post('/login', params=auth_req.params)
-    response = redirect.follow()
-    assert response.status_code == 200
-    entry_data = {
-        'title': 'Hello there',
-        'body_text': 'This is a post'
-    }
-    makepost = app.post('/new', params=entry_data, status='3*')
-    redirected = makepost.follow()
-    #  it's a little weird that the only extant detail page goes to id = 9
-    #  will tease this out later
-    detailview = app.get('/detail/9')
-    assert entry_data['body_text'] in detailview.body
-
-
 def test_get_add_view_not_authorized(app, auth_req):
     response = app.get('/new', status='2*')
     actual = response.body
@@ -306,9 +289,45 @@ def test_edit(entry, app, auth_req):
         'title': 'Hello there: edited',
         'body_text': 'This is an edited post'
     }
-    # import pdb; pdb.set_trace()
+    # login
+    auth_req.params = {'username': 'admin', 'password': 'secret'}
+    redirect = app.post('/login', params=auth_req.params)
+    response = redirect.follow()
+    assert response.status_code == 200
+    # edit post
     edit_existing = app.post('/edit/{entry_id}'.format(entry_id=entry_id),
                              params=edit_data, status='3*')
     detail = app.get('/detail/{entry_id}'.format(entry_id=entry_id))
-    assert edit_data.body_text in detail.body
-    assert edit_data.title in detail.body
+    assert edit_data['body_text'] in detail.body
+    assert edit_data['title'] in detail.body
+    assert edit_existing.status_code == 302
+
+
+def test_markdown(app, db_session):
+    entry = journal.Entry.write(
+        title='Test Title',
+        body_text="\n".join(['#### Here is a small title, should be h4',
+                             '### Here is a small title, should be h3',
+                             '## Here is a medium title, should be h2',
+                             '# Here is a large title, should be h1',
+                             '### What follows is an unordered list',
+                             '* One',
+                             '* Two',
+                             '* Three',
+                             '* Four',
+                             '',
+                             'Here is an ordered list',
+                             '1. Foo',
+                             '2. Bar']),
+        session=db_session
+    )
+    db_session.flush()
+    entry_id = entry.id
+    detail = app.get('/detail/{entry_id}'.format(entry_id=entry_id))
+    print detail.body
+    assert '<div class="markdown">' in detail.body
+    assert "<h1>Here is a large title, should be h1</h1>" in detail.body
+    assert "<h3>Here is a small title, should be h3</h3>" in detail.body
+    assert "<ul>" in detail.body
+    assert "<ol>" in detail.body
+    assert "<li>One</li>" in detail.body
