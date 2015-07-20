@@ -1,7 +1,7 @@
 {% extends "base.jinja2" %}
 {% block head %}
-     <link rel="stylesheet" href="/static/pygments_default.css" type="text/css">
     {{ super() }}
+    <link rel="stylesheet" href="/static/pygments_default.css" type="text/css">
 {% endblock %}
 {% block nav %}
     <li><a href="{{ request.route_url('home') }}">Journal</a></li>

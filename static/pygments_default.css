@@ -3,12 +3,13 @@
 Stylesheet for 'default' style pygments tags
 ************************************************************************
 */
-
+#detail-view pre code span { font-size: 70%; font-weight: 400; 
+                             font-family: 'Droid Sans Mono'}
 .codehilite .hll { background-color: #ffffcc }
 .codehilite  { background: #f8f8f8; }
 .codehilite .c { color: #408080; font-style: italic } /* Comment */
 .codehilite .err { border: 1px solid #FF0000 } /* Error */
-.codehilite .k { color: #008000; font-weight: bold } /* Keyword */
+.codehilite .k { color: #008000; font-weight: 700 } /* Keyword */
 .codehilite .o { color: #666666 } /* Operator */
 .codehilite .cm { color: #408080; font-style: italic } /* Comment.Multiline */
 .codehilite .cp { color: #BC7A00 } /* Comment.Preproc */
@@ -17,34 +18,34 @@ Stylesheet for 'default' style pygments tags
 .codehilite .gd { color: #A00000 } /* Generic.Deleted */
 .codehilite .ge { font-style: italic } /* Generic.Emph */
 .codehilite .gr { color: #FF0000 } /* Generic.Error */
-.codehilite .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.codehilite .gh { color: #000080; font-weight: 700 } /* Generic.Heading */
 .codehilite .gi { color: #00A000 } /* Generic.Inserted */
 .codehilite .go { color: #808080 } /* Generic.Output */
-.codehilite .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
-.codehilite .gs { font-weight: bold } /* Generic.Strong */
-.codehilite .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.codehilite .gp { color: #000080; font-weight: 700 } /* Generic.Prompt */
+.codehilite .gs { font-weight: 700 } /* Generic.Strong */
+.codehilite .gu { color: #800080; font-weight: 700 } /* Generic.Subheading */
 .codehilite .gt { color: #0040D0 } /* Generic.Traceback */
-.codehilite .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
-.codehilite .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
-.codehilite .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.codehilite .kc { color: #008000; font-weight: 700 } /* Keyword.Constant */
+.codehilite .kd { color: #008000; font-weight: 700 } /* Keyword.Declaration */
+.codehilite .kn { color: #008000; font-weight: 700 } /* Keyword.Namespace */
 .codehilite .kp { color: #008000 } /* Keyword.Pseudo */
-.codehilite .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.codehilite .kr { color: #008000; font-weight: 700 } /* Keyword.Reserved */
 .codehilite .kt { color: #B00040 } /* Keyword.Type */
 .codehilite .m { color: #666666 } /* Literal.Number */
 .codehilite .s { color: #BA2121 } /* Literal.String */
 .codehilite .na { color: #7D9029 } /* Name.Attribute */
 .codehilite .nb { color: #008000 } /* Name.Builtin */
-.codehilite .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.codehilite .nc { color: #0000FF; font-weight: 700 } /* Name.Class */
 .codehilite .no { color: #880000 } /* Name.Constant */
 .codehilite .nd { color: #AA22FF } /* Name.Decorator */
-.codehilite .ni { color: #999999; font-weight: bold } /* Name.Entity */
-.codehilite .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.codehilite .ni { color: #999999; font-weight: 700 } /* Name.Entity */
+.codehilite .ne { color: #D2413A; font-weight: 700 } /* Name.Exception */
 .codehilite .nf { color: #0000FF } /* Name.Function */
 .codehilite .nl { color: #A0A000 } /* Name.Label */
-.codehilite .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
-.codehilite .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.codehilite .nn { color: #0000FF; font-weight: 700 } /* Name.Namespace */
+.codehilite .nt { color: #008000; font-weight: 700 } /* Name.Tag */
 .codehilite .nv { color: #19177C } /* Name.Variable */
-.codehilite .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.codehilite .ow { color: #AA22FF; font-weight: 700 } /* Operator.Word */
 .codehilite .w { color: #bbbbbb } /* Text.Whitespace */
 .codehilite .mf { color: #666666 } /* Literal.Number.Float */
 .codehilite .mh { color: #666666 } /* Literal.Number.Hex */
@@ -54,9 +55,9 @@ Stylesheet for 'default' style pygments tags
 .codehilite .sc { color: #BA2121 } /* Literal.String.Char */
 .codehilite .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
 .codehilite .s2 { color: #BA2121 } /* Literal.String.Double */
-.codehilite .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.codehilite .se { color: #BB6622; font-weight: 700 } /* Literal.String.Escape */
 .codehilite .sh { color: #BA2121 } /* Literal.String.Heredoc */
-.codehilite .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.codehilite .si { color: #BB6688; font-weight: 700 } /* Literal.String.Interpol */
 .codehilite .sx { color: #008000 } /* Literal.String.Other */
 .codehilite .sr { color: #BB6688 } /* Literal.String.Regex */
 .codehilite .s1 { color: #BA2121 } /* Literal.String.Single */

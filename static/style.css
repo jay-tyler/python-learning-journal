@@ -7,6 +7,7 @@ GLOBAL HTML ELEMENTS
 * {
     font-family: Lato, sans-serif;
     font-color: #eee;
+    font-size: 100%;
 }
 
 h1 {
