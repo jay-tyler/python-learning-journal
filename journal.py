@@ -21,7 +21,7 @@ from cryptacular.bcrypt import BCRYPTPasswordManager
 from markdown2 import Markdown
 
 markdowner = Markdown(extras=["code-friendly", "fenced-code-blocks",
-                              "cuddled-lists"])
+                              "cuddled-lists", "pyshell"])
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 
