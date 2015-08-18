@@ -103,7 +103,7 @@ def test_post_to_add_view_not_authorized(app, auth_req):
     }
     response = app.post('/new', params=entry_data, status='4*')
     actual = response.body
-    assert "403 Forbidden"in actual
+    assert "403 Forbidden" in actual
 
 
 def test_post_to_add_view_authorized(app, auth_req):
@@ -121,11 +121,32 @@ def test_post_to_add_view_authorized(app, auth_req):
     assert entry_data['title'] in actual
 
 
+def test_post_to_add_view_authorized_bad_title(app, auth_req):
+    auth_req.params = {'username': 'admin', 'password': 'secret'}
+    redirect = app.post('/login', params=auth_req.params)
+    response = redirect.follow()
+    assert response.status_code == 200
+    entry_data = {
+        'body_text': 'This is a post',
+        'title': ''
+    }
+    response = app.post('/new', params=entry_data, status='2*')
+    assert 'Try Again: need both an entry and a title' in response.body
+
+
 def test_get_add_view_not_authorized(app, auth_req):
     response = app.get('/new', status='2*')
     actual = response.body
     assert "You need to be logged in to do this." in actual
 
+
+def test_post_to_add_view_not_authorized(app, auth_req):
+    entry_data = {
+        'body_text': 'This is a post',
+        'title': ''
+    }
+    response = app.post('/new', params=entry_data, status='4*')
+    assert response.status_code == 403
 
 def test_add_no_params(app, auth_req):
     auth_req.params = {'username': 'admin', 'password': 'secret'}
