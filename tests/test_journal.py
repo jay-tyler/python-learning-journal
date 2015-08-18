@@ -140,14 +140,6 @@ def test_get_add_view_not_authorized(app, auth_req):
     assert "You need to be logged in to do this." in actual
 
 
-def test_post_to_add_view_not_authorized(app, auth_req):
-    entry_data = {
-        'body_text': 'This is a post',
-        'title': ''
-    }
-    response = app.post('/new', params=entry_data, status='4*')
-    assert response.status_code == 403
-
 def test_add_no_params(app, auth_req):
     auth_req.params = {'username': 'admin', 'password': 'secret'}
     redirect = app.post('/login', params=auth_req.params)
