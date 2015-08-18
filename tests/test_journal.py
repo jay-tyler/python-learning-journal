@@ -2,83 +2,20 @@
 from __future__ import unicode_literals
 import os
 import pytest
-from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
-from pyramid import testing
-from cryptacular.bcrypt import BCRYPTPasswordManager
+import journal
 
-TEST_DATABASE_URL = os.environ.get(
-    'DATABASE_URL',
-    'postgresql://jason@localhost:5432/test-learning-journal'
-)
 
 INPUT_BTN = '<input type="submit" name="Submit" value="new">'
 
 
-os.environ['DATABASE_URL'] = TEST_DATABASE_URL
-os.environ['TESTING'] = "True"
+def login_helper(username, password, app):
+    """encapsulate app login for reuse in tests
 
-import journal
-
-
-@pytest.fixture(scope='session')
-def connection(request):
-    engine = create_engine(TEST_DATABASE_URL)
-    journal.Base.metadata.create_all(engine)
-    connection = engine.connect()
-    journal.DBSession.registry.clear()
-    journal.DBSession.configure(bind=connection)
-    journal.Base.metadata.bind = engine
-    request.addfinalizer(journal.Base.metadata.drop_all)
-    return connection
-
-
-@pytest.fixture()
-def db_session(request, connection):
-    from transaction import abort
-    trans = connection.begin()
-    request.addfinalizer(trans.rollback)
-    request.addfinalizer(abort)
-    from journal import DBSession
-    return DBSession
-
-
-@pytest.fixture
-def app(db_session):
-    from journal import main
-    from webtest import TestApp
-    app = main()
-    # main is just a factory that builds/returns configured wsgi apps
-    return TestApp(app)
-
-
-@pytest.fixture()
-def entry(db_session):
-    entry = journal.Entry.write(
-        title='Test Title',
-        body_text='Test Entry Text',
-        session=db_session
-    )
-    db_session.flush()
-    return entry
-
-
-@pytest.fixture(scope='function')
-def auth_req(request):
-    manager = BCRYPTPasswordManager()
-    settings = {
-        'auth.username': 'admin',
-        'auth.password': manager.encode('secret'),
-    }
-    testing.setUp(settings=settings)
-    req = testing.DummyRequest()
-
-    def cleanup():
-        testing.tearDown()
-
-    request.addfinalizer(cleanup)
-
-    return req
+    Accept all status codes so that we can make assertions in tests
+    """
+    login_data = {'username': username, 'password': password}
+    return app.post('/login', params=login_data, status='*')
 
 
 def test_write_entry(db_session):
@@ -166,7 +103,7 @@ def test_post_to_add_view_not_authorized(app, auth_req):
     }
     response = app.post('/new', params=entry_data, status='4*')
     actual = response.body
-    assert "403 Forbidden"in actual
+    assert "403 Forbidden" in actual
 
 
 def test_post_to_add_view_authorized(app, auth_req):
@@ -184,13 +121,26 @@ def test_post_to_add_view_authorized(app, auth_req):
     assert entry_data['title'] in actual
 
 
+def test_post_to_add_view_authorized_bad_title(app, auth_req):
+    auth_req.params = {'username': 'admin', 'password': 'secret'}
+    redirect = app.post('/login', params=auth_req.params)
+    response = redirect.follow()
+    assert response.status_code == 200
+    entry_data = {
+        'body_text': 'This is a post',
+        'title': ''
+    }
+    response = app.post('/new', params=entry_data, status='2*')
+    assert 'Try Again: need both an entry and a title' in response.body
+
+
 def test_get_add_view_not_authorized(app, auth_req):
     response = app.get('/new', status='2*')
     actual = response.body
     assert "You need to be logged in to do this." in actual
 
 
-def test_add_no_params(app):
+def test_add_no_params(app, auth_req):
     auth_req.params = {'username': 'admin', 'password': 'secret'}
     redirect = app.post('/login', params=auth_req.params)
     response = redirect.follow()
@@ -223,15 +173,6 @@ def test_do_login_missing_params(auth_req):
         auth_req.params = params
         with pytest.raises(ValueError):
             do_login(auth_req)
-
-
-def login_helper(username, password, app):
-    """encapsulate app login for reuse in tests
-
-    Accept all status codes so that we can make assertions in tests
-    """
-    login_data = {'username': username, 'password': password}
-    return app.post('/login', params=login_data, status='*')
 
 
 def test_start_as_anonymous(app):
